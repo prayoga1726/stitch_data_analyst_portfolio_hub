@@ -102,8 +102,10 @@
     <style>
         body {
             background-color: #f0fde9;
+            color: #141e12;
             background-image: radial-gradient(#665d4e 0.5px, transparent 0.5px);
             background-size: 32px 32px;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .material-symbols-outlined {
@@ -112,6 +114,54 @@
 
         .hover-glow:hover {
             box-shadow: 0 0 15px rgba(102, 93, 78, 0.1);
+        }
+
+        /* Dark Mode Styles */
+        html.dark body {
+            background-color: #0f170d;
+            color: #e8f5e1;
+            background-image: radial-gradient(#404e3d 0.5px, transparent 0.5px);
+        }
+
+        html.dark header {
+            background-color: #0f170d !important;
+            border-color: #21301f !important;
+        }
+
+        html.dark footer {
+            background-color: #0f170d !important;
+            border-color: #21301f !important;
+        }
+
+        html.dark a.bg-surface-container,
+        html.dark section a.bg-surface-container {
+            background-color: #162415 !important;
+            border-color: #263824 !important;
+        }
+
+        html.dark a.bg-surface-container:hover {
+            border-color: #9ab892 !important;
+            box-shadow: 0 0 15px rgba(154, 184, 146, 0.15);
+        }
+
+        html.dark .text-on-surface {
+            color: #e8f5e1 !important;
+        }
+
+        html.dark .text-on-surface-variant {
+            color: #a4b89f !important;
+        }
+
+        html.dark .text-primary {
+            color: #b5d4ab !important;
+        }
+
+        html.dark .border-outline-variant {
+            border-color: #263824 !important;
+        }
+
+        html.dark .bg-surface-container-highest {
+            background-color: #21301f !important;
         }
     </style>
 </head>
@@ -124,8 +174,8 @@
             <div class="flex items-center gap-4">
                 <button class="material-symbols-outlined text-primary active:scale-95 transition-transform"
                     data-icon="share">share</button>
-                <button class="material-symbols-outlined text-primary active:scale-95 transition-transform"
-                    data-icon="light_mode">light_mode</button>
+                <button id="theme-toggle" class="material-symbols-outlined text-primary active:scale-95 transition-transform cursor-pointer"
+                    title="Toggle Light/Dark Mode" data-icon="dark_mode">dark_mode</button>
                 <button class="material-symbols-outlined text-primary active:scale-95 transition-transform"
                     data-icon="qr_code">qr_code</button>
             </div>
@@ -270,6 +320,38 @@
         </div>
     </footer>
     <script>
+        // Theme Toggle Logic
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const htmlEl = document.documentElement;
+
+        function updateThemeUI(isDark) {
+            if (isDark) {
+                htmlEl.classList.add('dark');
+                htmlEl.classList.remove('light');
+                if (themeToggleBtn) themeToggleBtn.textContent = 'light_mode';
+            } else {
+                htmlEl.classList.remove('dark');
+                htmlEl.classList.add('light');
+                if (themeToggleBtn) themeToggleBtn.textContent = 'dark_mode';
+            }
+        }
+
+        // Initialize Theme from localStorage or System Preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const initialDark = savedTheme === 'dark' || (!savedTheme && systemPrefersDark);
+
+        updateThemeUI(initialDark);
+
+        if (themeToggleBtn) {
+            themeToggleBtn.addEventListener('click', () => {
+                const isCurrentlyDark = htmlEl.classList.contains('dark');
+                const newDarkState = !isCurrentlyDark;
+                localStorage.setItem('theme', newDarkState ? 'dark' : 'light');
+                updateThemeUI(newDarkState);
+            });
+        }
+
         // Intersection observer for fade-in animations
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
